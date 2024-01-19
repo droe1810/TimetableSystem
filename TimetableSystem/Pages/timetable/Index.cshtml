@@ -1,0 +1,42 @@
+﻿@page
+@using TimetableSystem.Models
+@model TimetableSystem.Pages.timetable.IndexModel
+@{
+    List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
+}
+
+
+<h1>Time table</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Room</th>
+            <th>Course</th>
+            <th>Class</th>
+            <th>Teacher</th>
+            <th>Timeslot</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Timetable tt in listTimetable)
+        {
+            <tr>
+                <td>@tt.Id</td>
+                <td>@tt.Room.Name</td>
+                <td>@tt.Course.Code</td>
+                <td>@tt.Class.Name</td>
+                <td>@tt.Teacher.Username</td>
+                <td>@tt.TimeslotType.Name</td>
+
+                <td>
+                    <a asp-page="./Edit" asp-route-id="">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
