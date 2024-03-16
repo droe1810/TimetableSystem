@@ -1,6 +1,7 @@
 ﻿@page
 @using TimetableSystem.Models
-@model TimetableSystem.Pages.timetable.IndexModel
+@model TimetableSystem.Pages.timetable.ImportModel
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
 }
@@ -8,11 +9,10 @@
 
 <h1>Time table</h1>
 
-<form method="post" asp-page-handler="ExportToJson">
-    <button type="submit" class="btn btn-primary">Export to Json</button>
+<form method="post" asp-page-handler="ImportFile" enctype="multipart/form-data">
+    <input type="file" name="file" >
+    <input type="submit" value="Import">
 </form>
-
-
 
 @if (ViewData["listTimetable"] != null)
 {
@@ -31,11 +31,11 @@
             @foreach (var timetable in listTimetable)
             {
                 <tr>
-                    <td>@timetable.Room.Name</td>
-                    <td>@timetable.Course.Code</td>
-                    <td>@timetable.Class.Name</td>
-                    <td>@timetable.Teacher.Username</td>
-                    <td>@timetable.TimeslotType.Name</td>
+                    <td>@timetable.RoomId</td>
+                    <td>@timetable.CourseId</td>
+                    <td>@timetable.ClassId</td>
+                    <td>@timetable.TeacherId</td>
+                    <td>@timetable.TimeslotTypeId</td>
                 </tr>
             }
         </tbody>
