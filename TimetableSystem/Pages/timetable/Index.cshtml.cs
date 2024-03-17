@@ -29,7 +29,6 @@ namespace TimetableSystem.Pages.timetable
             foreach (var item in listTimetable)
             {
                 TimetableJson itemJson = new TimetableJson();
-                itemJson.Id = item.Id;
                 itemJson.ClassName = item.Class.Name;
                 itemJson.RoomName = item.Room.Name;
                 itemJson.CourseCode = item.Course.Code;

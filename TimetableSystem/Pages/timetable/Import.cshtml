@@ -25,17 +25,19 @@
                 <th>Class</th>
                 <th>Teacher</th>
                 <th>Timeslot Type</th>
+                <th>Note</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var timetable in listTimetable)
             {
                 <tr>
-                    <td>@timetable.RoomId</td>
-                    <td>@timetable.CourseId</td>
-                    <td>@timetable.ClassId</td>
-                    <td>@timetable.TeacherId</td>
-                    <td>@timetable.TimeslotTypeId</td>
+                    <td>@timetable.Room.Name</td>
+                    <td>@timetable.Course.Code</td>
+                    <td>@timetable.Class.Name</td>
+                    <td>@timetable.Teacher.Username</td>
+                    <td>@timetable.TimeslotType.Name</td>
+                    <td>@timetable.Note</td>
                 </tr>
             }
         </tbody>

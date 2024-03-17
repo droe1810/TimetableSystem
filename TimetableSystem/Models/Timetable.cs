@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TimetableSystem.Models
 {
@@ -11,6 +12,9 @@ namespace TimetableSystem.Models
         public int ClassId { get; set; }
         public int TeacherId { get; set; }
         public int TimeslotTypeId { get; set; }
+
+        [NotMapped]
+        public string Note { get; set; }
 
         public virtual Class Class { get; set; } = null!;
         public virtual Course Course { get; set; } = null!;
