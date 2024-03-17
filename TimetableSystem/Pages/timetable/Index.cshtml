@@ -20,6 +20,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Room</th>
                 <th>Course</th>
                 <th>Class</th>
@@ -31,6 +32,7 @@
             @foreach (var timetable in listTimetable)
             {
                 <tr>
+                    <td>@timetable.Id</td>
                     <td>@timetable.Room.Name</td>
                     <td>@timetable.Course.Code</td>
                     <td>@timetable.Class.Name</td>

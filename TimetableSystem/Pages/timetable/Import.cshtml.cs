@@ -13,7 +13,6 @@ namespace TimetableSystem.Pages.timetable
     public class ImportModel : PageModel
     {
 
-        public List<Timetable> list = new List<Timetable>();
 
 
         public void OnGet()
@@ -24,7 +23,8 @@ namespace TimetableSystem.Pages.timetable
 
         public IActionResult OnPostImportFile(IFormFile file)
         {
-            List<Timetable> listTimetable = new List<Timetable>();
+            List<Timetable> listTimetableToDisplay = new List<Timetable>();
+            List<Timetable> listTimetableToCheck = BaseService.GetAllTimetable();
             if (file != null && file.Length > 0)
             {
                 using (var r = new StreamReader(file.OpenReadStream()))
@@ -34,19 +34,43 @@ namespace TimetableSystem.Pages.timetable
                     foreach (var itemJson in listTimetableJson)
                     {
                         Timetable item = new Timetable();
-                        item.Id = itemJson.Id;
-                        item.CourseId = BaseService.GetCourseByCode(itemJson.CourseCode).Id;
-                        item.RoomId = BaseService.GetRoomByName(itemJson.RoomName).Id;
-                        item.ClassId = BaseService.GetClassByName(itemJson.ClassName).Id;
-                        item.TeacherId = BaseService.GetUserByName(itemJson.TeacherName).Id;
-                        item.TimeslotTypeId = BaseService.GetTimeslotTypeByName(itemJson.TimeslotTypeName).Id;
+                        item.Course = BaseService.GetCourseByCode(itemJson.CourseCode);
+                        item.Room = BaseService.GetRoomByName(itemJson.RoomName);
+                        item.Class = BaseService.GetClassByName(itemJson.ClassName);
+                        item.Teacher = BaseService.GetUserByName(itemJson.TeacherName);
+                        item.TimeslotType = BaseService.GetTimeslotTypeByName(itemJson.TimeslotTypeName);
 
-                        listTimetable.Add(item);
+
+                        foreach (var itemCheck in listTimetableToCheck)
+                        {
+                            if (item.Teacher.Id == itemCheck.Teacher.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                            {
+                                item.Note += " Teacher has been teaching in another timeslot.";
+                            }
+                            if (item.Class.Id == itemCheck.Class.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                            {
+                                item.Note += " Class has been studing in another timeslot.";
+                            }
+                            if (item.Room.Id == itemCheck.Room.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                            {
+                                item.Note += " Room has been booking in another timeslot.";
+                            }
+                            if (item.Class.Id == itemCheck.Class.Id && item.Course.Id == itemCheck.Course.Id)
+                            {
+                                item.Note += " Class has been studying course in another timeslot.";
+                            }
+
+                        }
+                        if((item.Note == null || item.Note.Equals("")))
+                        {
+                            listTimetableToCheck.Add(item);
+                        }
+                        listTimetableToDisplay.Add(item);
                     }
                 }
-               
+
             }
-            ViewData["listTimetable"] = listTimetable;
+            ViewData["listTimetable"] = listTimetableToDisplay;
 
             return Page();
         }
