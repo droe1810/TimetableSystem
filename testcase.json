@@ -1,0 +1,59 @@
+[
+  {
+    "RoomName": "D101",
+    "CourseCode": "PRU211",
+    "ClassName": "SE1701",
+    "TeacherName": "chilp",
+    "TimeslotTypeName": "M2"
+  },
+  {
+    "RoomName": "D201",
+    "CourseCode": "PRM392",
+    "ClassName": "SE1702",
+    "TeacherName": "tuanvm",
+    "TimeslotTypeName": "M1"
+  },
+  {
+    "RoomName": "D201",
+    "CourseCode": "PRM392",
+    "ClassName": "SE1704",
+    "TeacherName": "khuongpd",
+    "TimeslotTypeName": "M1"
+  },
+  {
+    "RoomName": "D103",
+    "CourseCode": "PRU211",
+    "ClassName": "SE1701",
+    "TeacherName": "sonnt5",
+    "TimeslotTypeName": "M3"
+  },
+  {
+    "RoomName": "D101",
+    "CourseCode": "PRN231",
+    "ClassName": "SE1704",
+    "TeacherName": "hailt",
+    "TimeslotTypeName": "M2"
+  },
+
+  {
+    "RoomName": "A101",
+    "CourseCode": "PRU211",
+    "ClassName": "SE1701",
+    "TeacherName": "sonnt5",
+    "TimeslotTypeName": "M2"
+  },
+  {
+    "RoomName": "D101",
+    "CourseCode": "PRU211",
+    "ClassName": "SE1701",
+    "TeacherName": "chilp",
+    "TimeslotTypeName": "M2"
+  },
+  {
+    "RoomName": "A103",
+    "CourseCode": "PRN211",
+    "ClassName": "SE1706",
+    "TeacherName": "sonnt5",
+    "TimeslotTypeName": "E2"
+  }
+]
