@@ -57,23 +57,24 @@ namespace TimetableSystem.Pages.timetable
                             }
                             if (item.Class.Id == itemCheck.Class.Id && item.Course.Id == itemCheck.Course.Id)
                             {
-                                item.Note += " Class has been studying course in another timeslot.";
+                                item.Note += " Class has taken the course before.";
                             }
 
                         }
-                        if((item.Note == null || item.Note.Equals("")))
+                        if ((item.Note == null || item.Note.Equals("")))
                         {
                             listTimetableToCheck.Add(item);
                         }
                         listTimetableToDisplay.Add(item);
+                        ViewData["listTimetable"] = listTimetableToDisplay;
+
                     }
                 }
 
             }
-            ViewData["listTimetable"] = listTimetableToDisplay;
-
             return Page();
-        }
 
+
+        }
     }
 }

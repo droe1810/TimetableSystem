@@ -4,6 +4,7 @@
 @addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
+    string msg = ViewData["msg"] as string;
 }
 
 
@@ -16,31 +17,35 @@
 
 @if (ViewData["listTimetable"] != null)
 {
-    <h2> Timetable Data:</h2>
     <table class="table">
         <thead>
             <tr>
+                <th>STT</th>
                 <th>Room</th>
-                <th>Course</th>
                 <th>Class</th>
+                <th>Course</th>
                 <th>Teacher</th>
                 <th>Timeslot Type</th>
                 <th>Note</th>
             </tr>
         </thead>
         <tbody>
+            @{
+                int stt = 1;
+            }
             @foreach (var timetable in listTimetable)
             {
                 <tr>
+                    <td>@stt</td>   
                     <td>@timetable.Room.Name</td>
-                    <td>@timetable.Course.Code</td>
                     <td>@timetable.Class.Name</td>
+                    <td>@timetable.Course.Code</td>
                     <td>@timetable.Teacher.Username</td>
                     <td>@timetable.TimeslotType.Name</td>
                     <td>@timetable.Note</td>
                 </tr>
+                stt++;
             }
         </tbody>
     </table>
 }
-
