@@ -1,22 +1,24 @@
 ﻿@page
+@using Newtonsoft.Json
 @using TimetableSystem.Models
 @model TimetableSystem.Pages.timetable.ImportModel
 @addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
-    string msg = ViewData["msg"] as string;
 }
 
 
 <h1>Time table</h1>
 
 <form method="post" asp-page-handler="ImportFile" enctype="multipart/form-data">
-    <input type="file" name="file" >
+    <input type="file" name="file">
     <input type="submit" value="Import">
 </form>
 
 @if (ViewData["listTimetable"] != null)
 {
+
+
     <table class="table">
         <thead>
             <tr>
@@ -36,7 +38,7 @@
             @foreach (var timetable in listTimetable)
             {
                 <tr>
-                    <td>@stt</td>   
+                    <td>@stt</td>
                     <td>@timetable.Room.Name</td>
                     <td>@timetable.Class.Name</td>
                     <td>@timetable.Course.Code</td>
@@ -47,5 +49,13 @@
                 stt++;
             }
         </tbody>
+
     </table>
+
+    <form method="post" asp-page-handler="Save">
+        <input type="hidden" name="listTimetableDisplay" value="@JsonConvert.SerializeObject(listTimetable)" />
+        <input type="submit" value="Ignore invalid data and save">
+    </form>
+
 }
+

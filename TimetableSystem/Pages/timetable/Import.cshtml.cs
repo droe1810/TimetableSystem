@@ -5,6 +5,8 @@ using System;
 using TimetableSystem.Models;
 using System.Text.Json;
 using TimetableSystem.Services;
+using Newtonsoft.Json;
+
 
 
 
@@ -61,7 +63,7 @@ namespace TimetableSystem.Pages.timetable
                             }
 
                         }
-                        if ((item.Note == null || item.Note.Equals("")))
+                        if (item.Note == null || item.Note.Equals(""))
                         {
                             listTimetableToCheck.Add(item);
                         }
@@ -75,6 +77,37 @@ namespace TimetableSystem.Pages.timetable
             return Page();
 
 
+        }
+
+        public IActionResult OnPostSave(string listTimetableDisplay)
+        {
+            if (!string.IsNullOrEmpty(listTimetableDisplay))
+            {
+                List<Timetable> listDisplay = JsonConvert.DeserializeObject<List<Timetable>>(listTimetableDisplay);
+                List<Timetable> listToSave = new List<Timetable>();
+
+                foreach (var itemDisplay in listDisplay)
+                {
+                    if (itemDisplay.Note == null || itemDisplay.Note.Equals(""))
+                    {
+                        listToSave.Add(itemDisplay);
+                    }
+                }
+
+                foreach(var itemToSave in listToSave)
+                {
+                    Timetable item = new Timetable();
+                    item.CourseId = itemToSave.Course.Id;
+                    item.RoomId = itemToSave.Room.Id;
+                    item.ClassId = itemToSave.Class.Id; 
+                    item.TeacherId = itemToSave.Teacher.Id;
+                    item.TimeslotTypeId = itemToSave.TimeslotType.Id;
+                    
+                    BaseService.AddTimetable(item);
+
+                }
+            }
+            return Page();
         }
     }
 }
