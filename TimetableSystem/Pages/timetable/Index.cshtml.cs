@@ -12,15 +12,43 @@ namespace TimetableSystem.Pages.timetable
 {
     public class IndexModel : PageModel
     {
-     
 
         public IActionResult OnGet()
         {
+            getData();
             List<Timetable> listTimetable = BaseService.GetAllTimetable();
             ViewData["listTimetable"] = listTimetable;
 
             return Page();
         }
+
+        public IActionResult OnPostFilter(int classid, int courseid, int roomid, int teacherid, int timeslottypeid) {
+            getData();
+
+            List<Timetable> listTimetable = BaseService.FilterListTimetable(classid, courseid, roomid, teacherid, timeslottypeid);
+            ViewData["listTimetable"] = listTimetable;
+
+            return Page();
+        }
+
+        public void getData()
+        {
+            List<Room> listRoom = BaseService.GetAllRoom();
+            ViewData["listRoom"] = listRoom;
+
+            List<User> listTeacher = BaseService.GetAllTeacher();
+            ViewData["listTeacher"] = listTeacher;
+
+            List<Course> listCourse = BaseService.GetAllCourse();
+            ViewData["listCourse"] = listCourse;
+
+            List<TimeslotType> listTimeslotType = BaseService.GetAllTimeslotType();
+            ViewData["listTimeslotType"] = listTimeslotType;
+
+            List<Class> listClass = BaseService.GetAllClass();
+            ViewData["listClass"] = listClass;
+        }
+
 
         public IActionResult OnPostExportToJson()
         {

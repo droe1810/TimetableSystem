@@ -20,6 +20,48 @@ namespace TimetableSystem.Services
             }
         }
 
+        public static List<Class> GetAllClass()
+        {
+            List<Class> classes = new List<Class>();
+            using (var context = new prn221Context())
+            {
+                classes = context.Classes.ToList();
+            }
+            return classes; 
+        }
+
+        public static List<Room> GetAllRoom()
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Rooms.ToList();
+            }
+        }
+
+        public static List<User> GetAllTeacher()
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Users.Where(u => u.RoleId == 2).ToList();
+            }
+        }
+
+        public static List<Course> GetAllCourse()
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Courses.ToList();
+            }
+        }
+
+        public static List<TimeslotType> GetAllTimeslotType()
+        {
+            using (var context = new prn221Context())
+            {
+                return context.TimeslotTypes.ToList();
+            }
+        }
+
         public static Timetable GetTimetableById(int id)
         {
             using (var context = new prn221Context())
@@ -33,6 +75,49 @@ namespace TimetableSystem.Services
                     .FirstOrDefault(i => i.Id == id);
             }
         }
+
+        public static List<Timetable> FilterListTimetable(int classid, int courseid, int roomid, int teacherid, int timeslottypeid)
+        {
+            List<Timetable> list = new List<Timetable>();
+
+            using (var context = new prn221Context())
+            {
+                var query = context.Timetables.AsQueryable();
+
+                if (classid != 0)
+                {
+                    query = query.Where(t => t.ClassId == classid);
+                }
+                if (courseid != 0)
+                {
+                    query = query.Where(t => t.CourseId == courseid);
+                }
+                if (roomid != 0)
+                {
+                    query = query.Where(t => t.RoomId == roomid);
+                }
+                if (teacherid != 0)
+                {
+                    query = query.Where(t => t.TeacherId == teacherid);
+                }
+                if (timeslottypeid != 0)
+                {
+                    query = query.Where(t => t.TimeslotTypeId == timeslottypeid);
+                }
+
+                query = query.Include(t => t.Class)
+                             .Include(t => t.Course)
+                             .Include(t => t.Room)
+                             .Include(t => t.Teacher)
+                             .Include(t => t.TimeslotType);
+
+                list = query.ToList();
+            }
+
+            return list;
+        }
+
+
 
         public static void AddTimetable(Timetable timetable)
         {

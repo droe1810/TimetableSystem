@@ -1,28 +1,76 @@
 ﻿@page
 @using TimetableSystem.Models
 @model TimetableSystem.Pages.timetable.IndexModel
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
+    List<Room> listRoom = ViewData["listRoom"] as List<Room>;
+    List<User> listTeacher = ViewData["listTeacher"] as List<User>;
+    List<Course> listCourse = ViewData["listCourse"] as List<Course>;
+    List<TimeslotType> listTimeslotType = ViewData["listTimeslotType"] as List<TimeslotType>;
+    List<Class> listClass = ViewData["listClass"] as List<Class>;
 }
-
 
 <h1>Time table</h1>
 
-<form method="post" asp-page-handler="ExportToJson">
-    <button type="submit" class="btn btn-primary">Export to Json</button>
+
+<form method="post" onsubmit="saveSelectedValues()" asp-page-handler="Filter">
+    <select name="classid">
+        <option value="0">All Class</option>
+        @foreach (Class c in listClass)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+
+    <select name="courseid">
+        <option value="0">All Course</option>
+        @foreach (Course c in listCourse)
+        {
+            <option value="@c.Id">@c.Code</option>
+        }
+    </select>
+
+    <select name="roomid">
+        <option value="0">All Room</option>
+        @foreach (Room r in listRoom)
+        {
+            <option value="@r.Id">@r.Name</option>
+        }
+    </select>
+
+    <select name="teacherid">
+        <option value="0">All Teacher</option>
+        @foreach (User u in listTeacher)
+        {
+            <option value="@u.Id">@u.Username</option>
+        }
+    </select>
+
+    <select name="timeslottypeid">
+        <option value="0">All Timeslot Type</option>
+        @foreach (TimeslotType tst in listTimeslotType)
+        {
+            <option value="@tst.Id">@tst.Name</option>
+        }
+    </select>
+
+
+    <input type="submit" value="Filter">
 </form>
 
 
-
-@if (ViewData["listTimetable"] != null)
+@if (listTimetable != null && listTimetable.Count != 0)
 {
+    
+
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Room</th>
-                <th>Course</th>
                 <th>Class</th>
+                <th>Course</th>
+                <th>Room</th>
                 <th>Teacher</th>
                 <th>Timeslot Type</th>
             </tr>
@@ -32,14 +80,55 @@
             {
                 <tr>
                     <td>@timetable.Id</td>
-                    <td>@timetable.Room.Name</td>
-                    <td>@timetable.Course.Code</td>
                     <td>@timetable.Class.Name</td>
+                    <td>@timetable.Course.Code</td>
+                    <td>@timetable.Room.Name</td>
                     <td>@timetable.Teacher.Username</td>
                     <td>@timetable.TimeslotType.Name</td>
                 </tr>
             }
         </tbody>
     </table>
+
+    <form method="post" asp-page-handler="ExportToJson">
+        <button type="submit" class="btn btn-primary">Export to Json</button>
+    </form>
+}
+else
+{
+    <h3>No data to display</h3>
+
 }
 
+<script>
+    // Hàm này sẽ được gọi khi form được submit
+    function saveSelectedValues() {
+        var selectedValues = {};
+
+        // Lưu giá trị đã chọn của mỗi select box vào object selectedValues
+        selectedValues['classid'] = document.querySelector('select[name="classid"]').value;
+        selectedValues['courseid'] = document.querySelector('select[name="courseid"]').value;
+        selectedValues['roomid'] = document.querySelector('select[name="roomid"]').value;
+        selectedValues['teacherid'] = document.querySelector('select[name="teacherid"]').value;
+        selectedValues['timeslottypeid'] = document.querySelector('select[name="timeslottypeid"]').value;
+
+        // Lưu object selectedValues vào localStorage
+        localStorage.setItem('selectedValues', JSON.stringify(selectedValues));
+    }
+
+    // Hàm này sẽ được gọi khi trang được load
+    window.onload = function () {
+        // Lấy các giá trị đã lưu từ localStorage
+        var savedValues = JSON.parse(localStorage.getItem('selectedValues'));
+
+        // Nếu đã có giá trị được lưu trước đó
+        if (savedValues) {
+            // Khôi phục các giá trị đã chọn cho các select box
+            document.querySelector('select[name="classid"]').value = savedValues['classid'];
+            document.querySelector('select[name="courseid"]').value = savedValues['courseid'];
+            document.querySelector('select[name="roomid"]').value = savedValues['roomid'];
+            document.querySelector('select[name="teacherid"]').value = savedValues['teacherid'];
+            document.querySelector('select[name="timeslottypeid"]').value = savedValues['timeslottypeid'];
+        }
+    }
+</script>
