@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
 using TimetableSystem.Models;
 
 namespace TimetableSystem.Services
 {
-    public class BaseService
+    public class TimetableService
     {
         public static List<Timetable> GetAllTimetable()
         {
@@ -17,48 +16,6 @@ namespace TimetableSystem.Services
                     .Include(x => x.Teacher)
                     .Include(x => x.TimeslotType)
                     .ToList();
-            }
-        }
-
-        public static List<Class> GetAllClass()
-        {
-            List<Class> classes = new List<Class>();
-            using (var context = new prn221Context())
-            {
-                classes = context.Classes.ToList();
-            }
-            return classes; 
-        }
-
-        public static List<Room> GetAllRoom()
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Rooms.ToList();
-            }
-        }
-
-        public static List<User> GetAllTeacher()
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Users.Where(u => u.RoleId == 2).ToList();
-            }
-        }
-
-        public static List<Course> GetAllCourse()
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Courses.ToList();
-            }
-        }
-
-        public static List<TimeslotType> GetAllTimeslotType()
-        {
-            using (var context = new prn221Context())
-            {
-                return context.TimeslotTypes.ToList();
             }
         }
 
@@ -117,8 +74,6 @@ namespace TimetableSystem.Services
             return list;
         }
 
-
-
         public static void AddTimetable(Timetable timetable)
         {
             using (var context = new prn221Context())
@@ -133,7 +88,7 @@ namespace TimetableSystem.Services
             Timetable oldTimetable = new Timetable();
             using (var context = new prn221Context())
             {
-                oldTimetable = GetTimetableById (newTimetable.Id);
+                oldTimetable = GetTimetableById(newTimetable.Id);
                 oldTimetable.RoomId = newTimetable.RoomId;
                 oldTimetable.CourseId = newTimetable.CourseId;
                 oldTimetable.TimeslotTypeId = newTimetable.TimeslotTypeId;
@@ -156,47 +111,5 @@ namespace TimetableSystem.Services
                 }
             }
         }
-
-        public static Room GetRoomByName(string name)
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Rooms.FirstOrDefault(r => r.Name.ToLower().Equals(name.ToLower()));
-            }
-        }
-
-
-        public static TimeslotType GetTimeslotTypeByName(string name)
-        {
-            using (var context = new prn221Context())
-            {
-                return context.TimeslotTypes.FirstOrDefault(t => t.Name.ToLower().Equals(name.ToLower()));
-            }
-        }
-
-        public static Course GetCourseByCode(string code)
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Courses.FirstOrDefault(c => c.Code.ToLower().Equals(code.ToLower()));
-            }
-        }
-
-        public static Class GetClassByName(string name)
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Classes.FirstOrDefault(c => c.Name.ToLower().Equals(name.ToLower()));
-            }
-        }
-
-        public static User GetUserByName(string name)
-        {
-            using (var context = new prn221Context())
-            {
-                return context.Users.FirstOrDefault(u => u.Username.ToLower().Equals(name.ToLower()));
-            }
-        }
-
     }
 }

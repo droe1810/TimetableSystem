@@ -26,7 +26,7 @@ namespace TimetableSystem.Pages.timetable
         public IActionResult OnPostImportFile(IFormFile file)
         {
             List<Timetable> listTimetableToDisplay = new List<Timetable>();
-            List<Timetable> listTimetableToCheck = BaseService.GetAllTimetable();
+            List<Timetable> listTimetableToCheck = TimetableService.GetAllTimetable();
             if (file != null && file.Length > 0)
             {
                 using (var r = new StreamReader(file.OpenReadStream()))
@@ -36,11 +36,11 @@ namespace TimetableSystem.Pages.timetable
                     foreach (var itemJson in listTimetableJson)
                     {
                         Timetable item = new Timetable();
-                        item.Course = BaseService.GetCourseByCode(itemJson.CourseCode);
-                        item.Room = BaseService.GetRoomByName(itemJson.RoomName);
-                        item.Class = BaseService.GetClassByName(itemJson.ClassName);
-                        item.Teacher = BaseService.GetUserByName(itemJson.TeacherName);
-                        item.TimeslotType = BaseService.GetTimeslotTypeByName(itemJson.TimeslotTypeName);
+                        item.Course = CourseService.GetCourseByCode(itemJson.CourseCode);
+                        item.Room = RoomService.GetRoomByName(itemJson.RoomName);
+                        item.Class = ClassService.GetClassByName(itemJson.ClassName);
+                        item.Teacher = UserService.GetUserByName(itemJson.TeacherName);
+                        item.TimeslotType = TimeslotTypeService.GetTimeslotTypeByName(itemJson.TimeslotTypeName);
 
 
                         foreach (var itemCheck in listTimetableToCheck)
@@ -108,7 +108,7 @@ namespace TimetableSystem.Pages.timetable
                     item.TeacherId = itemToSave.Teacher.Id;
                     item.TimeslotTypeId = itemToSave.TimeslotType.Id;
                     
-                    BaseService.AddTimetable(item);
+                    TimetableService.AddTimetable(item);
 
                 }
             }

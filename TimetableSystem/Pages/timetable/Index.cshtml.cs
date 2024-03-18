@@ -16,7 +16,7 @@ namespace TimetableSystem.Pages.timetable
         public IActionResult OnGet()
         {
             getData();
-            List<Timetable> listTimetable = BaseService.GetAllTimetable();
+            List<Timetable> listTimetable = TimetableService.GetAllTimetable();
             ViewData["listTimetable"] = listTimetable;
 
             return Page();
@@ -25,7 +25,7 @@ namespace TimetableSystem.Pages.timetable
         public IActionResult OnPostFilter(int classid, int courseid, int roomid, int teacherid, int timeslottypeid) {
             getData();
 
-            List<Timetable> listTimetable = BaseService.FilterListTimetable(classid, courseid, roomid, teacherid, timeslottypeid);
+            List<Timetable> listTimetable = TimetableService.FilterListTimetable(classid, courseid, roomid, teacherid, timeslottypeid);
             ViewData["listTimetable"] = listTimetable;
 
             return Page();
@@ -33,26 +33,26 @@ namespace TimetableSystem.Pages.timetable
 
         public void getData()
         {
-            List<Room> listRoom = BaseService.GetAllRoom();
+            List<Room> listRoom = RoomService.GetAllRoom();
             ViewData["listRoom"] = listRoom;
 
-            List<User> listTeacher = BaseService.GetAllTeacher();
+            List<User> listTeacher = UserService.GetAllTeacher();
             ViewData["listTeacher"] = listTeacher;
 
-            List<Course> listCourse = BaseService.GetAllCourse();
+            List<Course> listCourse = CourseService.GetAllCourse();
             ViewData["listCourse"] = listCourse;
 
-            List<TimeslotType> listTimeslotType = BaseService.GetAllTimeslotType();
+            List<TimeslotType> listTimeslotType = TimeslotTypeService.GetAllTimeslotType();
             ViewData["listTimeslotType"] = listTimeslotType;
 
-            List<Class> listClass = BaseService.GetAllClass();
+            List<Class> listClass = ClassService.GetAllClass();
             ViewData["listClass"] = listClass;
         }
 
 
         public IActionResult OnPostExportToJson()
         {
-            List<Timetable> listTimetable = BaseService.GetAllTimetable();
+            List<Timetable> listTimetable = TimetableService.GetAllTimetable();
             List<TimetableJson> listTimetableJson = new List<TimetableJson>();
             foreach (var item in listTimetable)
             {
