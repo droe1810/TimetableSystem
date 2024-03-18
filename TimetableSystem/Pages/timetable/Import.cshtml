@@ -17,8 +17,6 @@
 
 @if (ViewData["listTimetable"] != null)
 {
-
-
     <table class="table">
         <thead>
             <tr>
@@ -44,7 +42,7 @@
                     <td>@timetable.Course.Code</td>
                     <td>@timetable.Teacher.Username</td>
                     <td>@timetable.TimeslotType.Name</td>
-                    <td>@timetable.Note</td>
+                    <td style="color : red">@timetable.Note</td>
                 </tr>
                 stt++;
             }

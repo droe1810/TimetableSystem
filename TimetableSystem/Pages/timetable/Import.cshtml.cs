@@ -47,25 +47,30 @@ namespace TimetableSystem.Pages.timetable
                         {
                             if (item.Teacher.Id == itemCheck.Teacher.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
                             {
-                                item.Note += " Teacher has been teaching in another timeslot.";
+                                item.Note += " Teacher has been teaching in another timeslot -";
                             }
                             if (item.Class.Id == itemCheck.Class.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
                             {
-                                item.Note += " Class has been studing in another timeslot.";
+                                item.Note += " Class has been studing in another timeslot -";
                             }
                             if (item.Room.Id == itemCheck.Room.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
                             {
-                                item.Note += " Room has been booking in another timeslot.";
+                                item.Note += " Room has been booking in another timeslot -";
                             }
                             if (item.Class.Id == itemCheck.Class.Id && item.Course.Id == itemCheck.Course.Id)
                             {
-                                item.Note += " Class has taken the course before.";
+                                item.Note += " Class has taken the course before -";
                             }
 
                         }
                         if (item.Note == null || item.Note.Equals(""))
                         {
                             listTimetableToCheck.Add(item);
+                        }
+                        else
+                        {
+                            int noteLegnth = item.Note.Length;
+                            item.Note = item.Note.Remove(noteLegnth - 1, 1);
                         }
                         listTimetableToDisplay.Add(item);
                         ViewData["listTimetable"] = listTimetableToDisplay;
