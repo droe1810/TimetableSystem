@@ -88,7 +88,7 @@ namespace TimetableSystem.Services
             Timetable oldTimetable = new Timetable();
             using (var context = new prn221Context())
             {
-                oldTimetable = GetTimetableById(newTimetable.Id);
+                oldTimetable = context.Timetables.FirstOrDefault(t => t.Id == newTimetable.Id);
                 oldTimetable.RoomId = newTimetable.RoomId;
                 oldTimetable.CourseId = newTimetable.CourseId;
                 oldTimetable.TimeslotTypeId = newTimetable.TimeslotTypeId;

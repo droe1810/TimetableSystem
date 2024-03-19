@@ -18,5 +18,12 @@ namespace TimetableSystem.Services
                 return context.Users.FirstOrDefault(u => u.Username.ToLower().Equals(name.ToLower()));
             }
         }
+        public static User GetUserById(int id)
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Users.FirstOrDefault(u => u.Id == id);
+            }
+        }
     }
 }

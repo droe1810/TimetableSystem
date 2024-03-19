@@ -18,5 +18,13 @@ namespace TimetableSystem.Services
                 return context.Courses.FirstOrDefault(c => c.Code.ToLower().Equals(code.ToLower()));
             }
         }
+
+        public static Course GetCourseById(int id)
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Courses.FirstOrDefault(c => c.Id == id);
+            }
+        }
     }
 }

@@ -20,5 +20,13 @@ namespace TimetableSystem.Services
                 return context.Classes.FirstOrDefault(c => c.Name.ToLower().Equals(name.ToLower()));
             }
         }
+
+        public static Class GetClassById(int id)
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Classes.FirstOrDefault(c => c.Id == id);
+            }
+        }
     }
 }

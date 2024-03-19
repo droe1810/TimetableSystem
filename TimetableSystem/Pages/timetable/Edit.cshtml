@@ -1,0 +1,86 @@
+﻿@page
+@model TimetableSystem.Pages.timetable.EditModel
+@using TimetableSystem.Models
+
+@{
+    Timetable tt = ViewData["timetable"] as Timetable;
+    Timetable expectedTT = ViewData["expectedTT"] as Timetable;
+
+    List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
+    List<Room> listRoom = ViewData["listRoom"] as List<Room>;
+    List<User> listTeacher = ViewData["listTeacher"] as List<User>;
+    List<Course> listCourse = ViewData["listCourse"] as List<Course>;
+    List<TimeslotType> listTimeslotType = ViewData["listTimeslotType"] as List<TimeslotType>;
+    List<Class> listClass = ViewData["listClass"] as List<Class>;
+}
+
+
+
+<h1>Edit timetable</h1>
+
+<h4></h4>
+<hr />
+<h5>Edit for:  @tt.Class.Name - @tt.Course.Code - @tt.Room.Name - @tt.Teacher.Username - @tt.TimeslotType.Name</h5>
+
+@if(expectedTT != null)
+{
+    <h5>Expected: @expectedTT.Class.Name - @expectedTT.Course.Code - @expectedTT.Room.Name - @expectedTT.Teacher.Username - @expectedTT.TimeslotType.Name</h5>
+}
+else
+{
+   <h5>Expected: </h5> 
+}
+<div class="row">
+    <div >
+
+        <form method="post" asp-page-handler="Edit">
+            <input type="hidden" name="timetableid" value="@tt.Id" />
+            <select name="classid">
+                @foreach (Class c in listClass)
+                {
+                    <option value="@c.Id" >@c.Name</option>
+                }
+            </select>
+
+            <select name="courseid">
+                @foreach (Course c in listCourse)
+                {
+                    <option value="@c.Id" >@c.Code</option>
+                }
+            </select>
+
+            <select name="roomid">
+                @foreach (Room r in listRoom)
+                {
+                    <option value="@r.Id" >@r.Name</option>
+                }
+            </select>
+
+            <select name="teacherid">
+                @foreach (User u in listTeacher)
+                {
+                    <option value="@u.Id" >@u.Username</option>
+                }
+            </select>
+
+            <select name="timeslottypeid">
+                @foreach (TimeslotType tst in listTimeslotType)
+                {
+                    <option value="@tst.Id" >@tst.Name</option>
+                }
+            </select>
+
+
+            <input type="submit" value="Edit">
+        </form>
+    </div>
+    @if (expectedTT != null)
+    {
+        <p style="color: red">@expectedTT.Note</p>
+    }
+</div>
+
+<div>
+    <a href="/timetable">Back to List</a>
+</div>
+
