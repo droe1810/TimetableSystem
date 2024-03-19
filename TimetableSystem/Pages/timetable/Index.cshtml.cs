@@ -89,5 +89,14 @@ namespace TimetableSystem.Pages.timetable
         {
             return Redirect($"/timetable/Edit?timetableid={timetableid}");
         }
+
+        public IActionResult OnGetDelete(int timetableid)
+        {
+            TimetableService.DeleteTimetable(timetableid);
+            getData();
+            List<Timetable> listTimetable = TimetableService.GetAllTimetable();
+            ViewData["listTimetable"] = listTimetable;
+            return Page();
+        }
     }
 }
