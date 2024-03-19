@@ -73,6 +73,7 @@
                 <th>Room</th>
                 <th>Teacher</th>
                 <th>Timeslot Type</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -85,6 +86,10 @@
                     <td>@timetable.Room.Name</td>
                     <td>@timetable.Teacher.Username</td>
                     <td>@timetable.TimeslotType.Name</td>
+                    <td>
+                        <a asp-page-handler="Edit" asp-route-timetableid="@timetable.Id">Edit |</a>
+                        <a asp-page-handler="Update" asp-route-timetableid="@timetable.Id">Update</a>
+                    </td>
                 </tr>
             }
         </tbody>

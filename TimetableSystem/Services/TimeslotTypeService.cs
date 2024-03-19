@@ -18,5 +18,13 @@ namespace TimetableSystem.Services
                 return context.TimeslotTypes.FirstOrDefault(t => t.Name.ToLower().Equals(name.ToLower()));
             }
         }
+        public static TimeslotType GetTimeslotTypeById(int id)
+        {
+            using (var context = new prn221Context())
+            {
+                return context.TimeslotTypes.FirstOrDefault(tts => tts.Id == id);
+            }
+        }
+
     }
 }

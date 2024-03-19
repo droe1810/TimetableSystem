@@ -47,19 +47,19 @@ namespace TimetableSystem.Pages.timetable
                         {
                             if (item.Teacher.Id == itemCheck.Teacher.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
                             {
-                                item.Note += " Teacher has been teaching in another timeslot -";
+                                item.Note += $" {item.Teacher.Username} has been teaching in timeslot {item.TimeslotType.Name} -";
                             }
                             if (item.Class.Id == itemCheck.Class.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
                             {
-                                item.Note += " Class has been studing in another timeslot -";
+                                item.Note += $" {item.Class.Name} has been studing in timeslot {item.TimeslotType.Name} -";
                             }
                             if (item.Room.Id == itemCheck.Room.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
                             {
-                                item.Note += " Room has been booking in another timeslot -";
+                                item.Note += $" {item.Room.Name} has been booking in timeslot {item.TimeslotType.Name} -";
                             }
                             if (item.Class.Id == itemCheck.Class.Id && item.Course.Id == itemCheck.Course.Id)
                             {
-                                item.Note += " Class has taken the course before -";
+                                item.Note += $" {item.Class.Name} has taken the course {item.Course.Code} before -";
                             }
 
                         }

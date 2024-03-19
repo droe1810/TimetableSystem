@@ -18,6 +18,12 @@ namespace TimetableSystem.Services
                 return context.Rooms.FirstOrDefault(r => r.Name.ToLower().Equals(name.ToLower()));
             }
         }
-
+        public static Room GetRoomById(int id)
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Rooms.FirstOrDefault(r => r.Id == id);
+            }
+        }
     }
 }

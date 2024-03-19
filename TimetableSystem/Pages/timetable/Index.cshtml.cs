@@ -84,5 +84,10 @@ namespace TimetableSystem.Pages.timetable
             byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
             return File(fileBytes, "application/json", fileName);
         }
+
+        public IActionResult OnGetEdit(int timetableid)
+        {
+            return Redirect($"/timetable/Edit?timetableid={timetableid}");
+        }
     }
 }
