@@ -141,7 +141,6 @@ else
 <script>
     function confirmDelete(timetableId) {
         if (confirm('Are you sure you want to delete this item?')) {
-            // Nếu người dùng đồng ý xóa, chuyển hướng đến trang xử lý xóa với id của mục cần xóa.timetable?timetableid=5&handler=Delete
             window.location.href = '/timetable?timetableid=' + timetableId + '&handler=Delete';
         }
     }
