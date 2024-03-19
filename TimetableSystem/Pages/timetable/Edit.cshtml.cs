@@ -35,19 +35,19 @@ namespace TimetableSystem.Pages.timetable
             return Page();
         }
 
-        public IActionResult OnPostEdit(int timetableid,int classid, int courseid, int roomid, int teacherid, int timeslottypeid)
+        public IActionResult OnPostEdit(int timetableid, int classidedit, int courseidedit, int roomidedit, int teacheridedit, int timeslottypeidedit)
         {
             Timetable oldTt = TimetableService.GetTimetableById(timetableid);
 
             Timetable expectedTT = new Timetable();
-            expectedTT.Class = ClassService.GetClassById(classid);
-            expectedTT.Course = CourseService.GetCourseById(courseid);
-            expectedTT.Room = RoomService.GetRoomById(roomid);
-            expectedTT.Teacher = UserService.GetUserById(teacherid);
-            expectedTT.TimeslotType = TimeslotTypeService.GetTimeslotTypeById(timeslottypeid);
+            expectedTT.Class = ClassService.GetClassById(classidedit);
+            expectedTT.Course = CourseService.GetCourseById(courseidedit);
+            expectedTT.Room = RoomService.GetRoomById(roomidedit);
+            expectedTT.Teacher = UserService.GetUserById(teacheridedit);
+            expectedTT.TimeslotType = TimeslotTypeService.GetTimeslotTypeById(timeslottypeidedit);
 
 
-            if (oldTt.Class.Id == classid && oldTt.Course.Id == courseid && oldTt.Room.Id == roomid && oldTt.Teacher.Id == teacherid && oldTt.TimeslotType.Id == timeslottypeid)
+            if (oldTt.Class.Id == classidedit && oldTt.Course.Id == courseidedit && oldTt.Room.Id == roomidedit && oldTt.Teacher.Id == teacheridedit && oldTt.TimeslotType.Id == timeslottypeidedit)
             {
                 oldTt.Note += " No Data change ";
             }

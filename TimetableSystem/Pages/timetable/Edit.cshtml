@@ -33,37 +33,37 @@ else
 <div class="row">
     <div >
 
-        <form method="post" asp-page-handler="Edit">
+        <form method="post" onsubmit="saveSelectedValues()" asp-page-handler="Edit">
             <input type="hidden" name="timetableid" value="@tt.Id" />
-            <select name="classid">
+            <select name="classidedit">
                 @foreach (Class c in listClass)
                 {
                     <option value="@c.Id" >@c.Name</option>
                 }
             </select>
 
-            <select name="courseid">
+            <select name="courseidedit">
                 @foreach (Course c in listCourse)
                 {
                     <option value="@c.Id" >@c.Code</option>
                 }
             </select>
 
-            <select name="roomid">
+            <select name="roomidedit">
                 @foreach (Room r in listRoom)
                 {
                     <option value="@r.Id" >@r.Name</option>
                 }
             </select>
 
-            <select name="teacherid">
+            <select name="teacheridedit">
                 @foreach (User u in listTeacher)
                 {
                     <option value="@u.Id" >@u.Username</option>
                 }
             </select>
 
-            <select name="timeslottypeid">
+            <select name="timeslottypeidedit">
                 @foreach (TimeslotType tst in listTimeslotType)
                 {
                     <option value="@tst.Id" >@tst.Name</option>
@@ -84,3 +84,35 @@ else
     <a href="/timetable">Back to List</a>
 </div>
 
+<script>
+    // Hàm này sẽ được gọi khi form được submit
+    function saveSelectedValues() {
+        var selectedValues = {};
+
+        // Lưu giá trị đã chọn của mỗi select box vào object selectedValues
+        selectedValues['classidedit'] = document.querySelector('select[name="classidedit"]').value;
+        selectedValues['courseidedit'] = document.querySelector('select[name="courseidedit"]').value;
+        selectedValues['roomidedit'] = document.querySelector('select[name="roomidedit"]').value;
+        selectedValues['teacheridedit'] = document.querySelector('select[name="teacheridedit"]').value;
+        selectedValues['timeslottypeidedit'] = document.querySelector('select[name="timeslottypeidedit"]').value;
+
+        // Lưu object selectedValues vào localStorage
+        localStorage.setItem('selectedValuesedit', JSON.stringify(selectedValues));
+    }
+
+    // Hàm này sẽ được gọi khi trang được load
+    window.onload = function () {
+        // Lấy các giá trị đã lưu từ localStorage
+        var savedValues = JSON.parse(localStorage.getItem('selectedValuesedit'));
+
+        // Nếu đã có giá trị được lưu trước đó
+        if (savedValues) {
+            // Khôi phục các giá trị đã chọn cho các select box
+            document.querySelector('select[name="classidedit"]').value = savedValues['classidedit'];
+            document.querySelector('select[name="courseidedit"]').value = savedValues['courseidedit'];
+            document.querySelector('select[name="roomidedit"]').value = savedValues['roomidedit'];
+            document.querySelector('select[name="teacheridedit"]').value = savedValues['teacheridedit'];
+            document.querySelector('select[name="timeslottypeidedit"]').value = savedValues['timeslottypeidedit'];
+        }
+    }
+</script>
