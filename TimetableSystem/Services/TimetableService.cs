@@ -103,7 +103,7 @@ namespace TimetableSystem.Services
         {
             using (var context = new prn221Context())
             {
-                var timetable = GetTimetableById(id);
+                var timetable = context.Timetables.FirstOrDefault(t => t.Id == id);
                 if (timetable != null)
                 {
                     context.Timetables.Remove(timetable);
