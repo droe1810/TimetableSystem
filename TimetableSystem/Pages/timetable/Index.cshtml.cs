@@ -15,48 +15,84 @@ namespace TimetableSystem.Pages.timetable
     public class IndexModel : PageModel
     {
         private readonly IHubContext<DocumentHub> _hubContext;
+        private readonly prn221Context _dbContext;
 
-        public IndexModel( IHubContext<DocumentHub> hubContext)
+        public List<Timetable> Timetables { get; set; } = null!;
+        public List<Class> Classes { get; set; } = null!;
+        public List<Course> Courses { get; set; } = null!;
+        public List<Room> Rooms { get; set; } = null!;
+        public List<User> Teachers { get; set; } = null!;
+        public List<TimeslotType> Timeslottypes { get; set; } = null!;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageIndex { get; set; }
+
+        [BindProperty]
+        public int Classid { get; set; }
+
+        [BindProperty]
+        public int Courseid { get; set; }
+
+        [BindProperty]
+        public int Roomid { get; set; }
+
+        [BindProperty]
+        public int Teacherid { get; set; }
+
+        [BindProperty]
+        public int Timeslottypeid { get; set; }
+
+        private int _totalItem, _pageSize, _startIndex;
+        public int TotalPage { get; set; }
+
+        public IndexModel(IHubContext<DocumentHub> hubContext, prn221Context dbContext)
         {
+            _dbContext = dbContext;
             _hubContext = hubContext;
         }
-
         public IActionResult OnGet()
         {
-            getData();
-            List<Timetable> listTimetable = TimetableService.GetAllTimetable();
-            ViewData["listTimetable"] = listTimetable;
-
+            GetDataPagging();
             return Page();
         }
 
-        public IActionResult OnPostFilter(int classid, int courseid, int roomid, int teacherid, int timeslottypeid) {
-            getData();
-
-            List<Timetable> listTimetable = TimetableService.FilterListTimetable(classid, courseid, roomid, teacherid, timeslottypeid);
-            ViewData["listTimetable"] = listTimetable;
-
-            return Page();
-        }
-
-        public void getData()
+        public IActionResult OnPostFilter()
         {
-            List<Room> listRoom = RoomService.GetAllRoom();
-            ViewData["listRoom"] = listRoom;
-
-            List<User> listTeacher = UserService.GetAllTeacher();
-            ViewData["listTeacher"] = listTeacher;
-
-            List<Course> listCourse = CourseService.GetAllCourse();
-            ViewData["listCourse"] = listCourse;
-
-            List<TimeslotType> listTimeslotType = TimeslotTypeService.GetAllTimeslotType();
-            ViewData["listTimeslotType"] = listTimeslotType;
-
-            List<Class> listClass = ClassService.GetAllClass();
-            ViewData["listClass"] = listClass;
+            GetDataPagging();
+            return Page();
         }
+        private void GetDataPagging()
+        {
+            Rooms = RoomService.GetAllRoom();
+            Teachers = UserService.GetAllTeacher();
+            Courses = CourseService.GetAllCourse();
+            Timeslottypes = TimeslotTypeService.GetAllTimeslotType();
+            Classes = ClassService.GetAllClass();
 
+            var result = _dbContext.Timetables.
+            Where(tt => Classid == 0 || tt.ClassId == Classid)
+            .Where(tt => Courseid == 0 || tt.CourseId == Courseid)
+            .Where(tt => Roomid == 0 || tt.RoomId == Roomid)
+            .Where(tt => Teacherid == 0 || tt.TeacherId == Teacherid)
+            .Where(tt => Timeslottypeid == 0 || tt.TimeslotTypeId == Timeslottypeid)
+            .Include(tt => tt.Class).Include(tt => tt.Course).Include(tt => tt.Room).Include(tt => tt.Teacher).Include(tt => tt.TimeslotType)
+            .OrderBy(tt => tt.Id);
+
+            if (PageIndex < 1) PageIndex = 1;
+            _totalItem = result.Count();
+            _pageSize = 5;
+            TotalPage = (int)Math.Ceiling((double)_totalItem / _pageSize);
+
+            if (TotalPage > 0)
+            {
+                if (PageIndex > TotalPage) PageIndex = TotalPage;
+                //_startIndex = (PageIndex - 1) * _pageSize + 1;
+
+                Timetables = result.Skip((PageIndex - 1) * _pageSize)
+                    .Take(_pageSize)
+                    .ToList();
+            }
+        }
 
         public IActionResult OnPostExportToJson()
         {
@@ -97,13 +133,10 @@ namespace TimetableSystem.Pages.timetable
         {
             return Redirect($"/timetable/Edit?timetableid={timetableid}");
         }
-
         public async Task<IActionResult> OnGetDelete(int timetableid)
         {
             TimetableService.DeleteTimetable(timetableid);
-            getData();
-            List<Timetable> listTimetable = TimetableService.GetAllTimetable();
-            ViewData["listTimetable"] = listTimetable;
+            GetDataPagging();
             await _hubContext.Clients.All.SendAsync("ReloadDocuments");
 
             return Page();

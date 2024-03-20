@@ -3,55 +3,49 @@
 @model TimetableSystem.Pages.timetable.IndexModel
 @addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
-    List<Room> listRoom = ViewData["listRoom"] as List<Room>;
-    List<User> listTeacher = ViewData["listTeacher"] as List<User>;
-    List<Course> listCourse = ViewData["listCourse"] as List<Course>;
-    List<TimeslotType> listTimeslotType = ViewData["listTimeslotType"] as List<TimeslotType>;
-    List<Class> listClass = ViewData["listClass"] as List<Class>;
+  
 }
 
 <h1>Time table</h1>
 
-
-<form method="post" onsubmit="saveSelectedValues()" asp-page-handler="Filter">
+<form method="post" asp-page-handler="Filter">
     <select name="classid">
-        <option value="0">All Class</option>
-        @foreach (Class c in listClass)
+        <option value="0" selected="@(Model.Classid == 0)">All Class</option>
+        @foreach (Class c in Model.Classes)
         {
-            <option value="@c.Id">@c.Name</option>
+            <option value="@c.Id" selected="@(c.Id == Model.Classid)">@c.Name</option>
         }
     </select>
 
     <select name="courseid">
-        <option value="0">All Course</option>
-        @foreach (Course c in listCourse)
+        <option value="0" selected="@(Model.Courseid == 0)">All Course</option>
+        @foreach (Course c in Model.Courses)
         {
-            <option value="@c.Id">@c.Code</option>
+            <option value="@c.Id" selected="@(c.Id == Model.Courseid)">@c.Code</option>
         }
     </select>
 
     <select name="roomid">
-        <option value="0">All Room</option>
-        @foreach (Room r in listRoom)
+        <option value="0" selected="@(Model.Classid == 0)">All Room</option>
+        @foreach (Room r in Model.Rooms)
         {
-            <option value="@r.Id">@r.Name</option>
+            <option value="@r.Id" selected="@(r.Id == Model.Roomid)">@r.Name</option>
         }
     </select>
 
     <select name="teacherid">
-        <option value="0">All Teacher</option>
-        @foreach (User u in listTeacher)
+        <option value="0" selected="@(Model.Teacherid == 0)">All Teacher</option>
+        @foreach (User u in Model.Teachers)
         {
-            <option value="@u.Id">@u.Username</option>
+            <option value="@u.Id" selected="@(u.Id == Model.Teacherid)">@u.Username</option>
         }
     </select>
 
     <select name="timeslottypeid">
-        <option value="0">All Timeslot Type</option>
-        @foreach (TimeslotType tst in listTimeslotType)
+        <option value="0" selected="@(Model.Timeslottypeid == 0)">All Timeslot Type</option>
+        @foreach (TimeslotType tst in Model.Timeslottypes)
         {
-            <option value="@tst.Id">@tst.Name</option>
+            <option value="@tst.Id" selected="@(tst.Id == Model.Timeslottypeid)">@tst.Name</option>
         }
     </select>
 
@@ -60,10 +54,8 @@
 </form>
 
 
-@if (listTimetable != null && listTimetable.Count != 0)
+@if (Model.Timetables != null && Model.Timetables.Count != 0)
 {
-
-
     <table class="table">
         <thead>
             <tr>
@@ -77,7 +69,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var timetable in listTimetable)
+            @foreach (var timetable in Model.Timetables)
             {
                 <tr>
                     <td>@timetable.Id</td>
@@ -95,48 +87,35 @@
         </tbody>
     </table>
 
-    <form method="post" asp-page-handler="ExportToJson">
+    <form style="float: right" method="post" asp-page-handler="ExportToJson">
         <button type="submit" class="btn btn-primary">Export to Json</button>
     </form>
+
+    @if (Model.TotalPage > 1)
+    {
+        <form method="post">
+            @for (int i = 1; i <= Model.TotalPage; i++)
+                @if (i == Model.PageIndex)
+                {
+                    <button type="submit" name="pageindex" value="@i" style=" font-size:1.5em; font-weight:bold" asp-page-handler="Filter">@i</button>
+
+                }
+                else
+                {
+                    <button type="submit" name="pageindex" value="@i" asp-page-handler="Filter">@i</button>
+                }
+            <input type="hidden" name="Classid" value="@Model.Classid" />
+            <input type="hidden" name="Courseid" value="@Model.Courseid" />
+            <input type="hidden" name="Roomid" value="@Model.Roomid" />
+            <input type="hidden" name="Teacherid" value="@Model.Teacherid" />
+            <input type="hidden" name="Timeslottypeid" value="@Model.Timeslottypeid" />
+        </form>
+    }
 }
 else
 {
     <h3>No data to display</h3>
-
 }
-
-<script>
-    // Hàm này sẽ được gọi khi form được submit
-    function saveSelectedValues() {
-        var selectedValues = {};
-
-        // Lưu giá trị đã chọn của mỗi select box vào object selectedValues
-        selectedValues['classid'] = document.querySelector('select[name="classid"]').value;
-        selectedValues['courseid'] = document.querySelector('select[name="courseid"]').value;
-        selectedValues['roomid'] = document.querySelector('select[name="roomid"]').value;
-        selectedValues['teacherid'] = document.querySelector('select[name="teacherid"]').value;
-        selectedValues['timeslottypeid'] = document.querySelector('select[name="timeslottypeid"]').value;
-
-        // Lưu object selectedValues vào localStorage
-        localStorage.setItem('selectedValues', JSON.stringify(selectedValues));
-    }
-
-    // Hàm này sẽ được gọi khi trang được load
-    window.onload = function () {
-        // Lấy các giá trị đã lưu từ localStorage
-        var savedValues = JSON.parse(localStorage.getItem('selectedValues'));
-
-        // Nếu đã có giá trị được lưu trước đó
-        if (savedValues) {
-            // Khôi phục các giá trị đã chọn cho các select box
-            document.querySelector('select[name="classid"]').value = savedValues['classid'];
-            document.querySelector('select[name="courseid"]').value = savedValues['courseid'];
-            document.querySelector('select[name="roomid"]').value = savedValues['roomid'];
-            document.querySelector('select[name="teacherid"]').value = savedValues['teacherid'];
-            document.querySelector('select[name="timeslottypeid"]').value = savedValues['timeslottypeid'];
-        }
-    }
-</script>
 
 <script>
     function confirmDelete(timetableId) {
