@@ -3,15 +3,7 @@
 @using TimetableSystem.Models
 
 @{
-    Timetable tt = ViewData["timetable"] as Timetable;
-    Timetable expectedTT = ViewData["expectedTT"] as Timetable;
 
-    List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
-    List<Room> listRoom = ViewData["listRoom"] as List<Room>;
-    List<User> listTeacher = ViewData["listTeacher"] as List<User>;
-    List<Course> listCourse = ViewData["listCourse"] as List<Course>;
-    List<TimeslotType> listTimeslotType = ViewData["listTimeslotType"] as List<TimeslotType>;
-    List<Class> listClass = ViewData["listClass"] as List<Class>;
 }
 
 
@@ -20,11 +12,11 @@
 
 <h4></h4>
 <hr />
-<h5>Edit for:  @tt.Class.Name - @tt.Course.Code - @tt.Room.Name - @tt.Teacher.Username - @tt.TimeslotType.Name</h5>
+<h5>Edit for:  @Model.oldTimetable.Class.Name - @Model.oldTimetable.Course.Code - @Model.oldTimetable.Room.Name - @Model.oldTimetable.Teacher.Username - @Model.oldTimetable.TimeslotType.Name</h5>
 
-@if(expectedTT != null)
+@if (Model.expectedTt != null)
 {
-    <h5>Expected: @expectedTT.Class.Name - @expectedTT.Course.Code - @expectedTT.Room.Name - @expectedTT.Teacher.Username - @expectedTT.TimeslotType.Name</h5>
+    <h5>Expected: @Model.expectedTt.Class.Name - @Model.expectedTt.Course.Code - @Model.expectedTt.Room.Name - @Model.expectedTt.Teacher.Username - @Model.expectedTt.TimeslotType.Name</h5>
 }
 else
 {
@@ -32,87 +24,63 @@ else
 }
 <div class="row">
     <div >
-
-        <form method="post" onsubmit="saveSelectedValues()" asp-page-handler="Edit">
-            <input type="hidden" name="timetableid" value="@tt.Id" />
-            <select name="classidedit">
-                @foreach (Class c in listClass)
+        <form method="post" asp-page-handler="Edit">
+            <input type="hidden" name="timetableid" value="@Model.oldTimetable.Id" />
+            <select name="Classid">
+                @foreach (Class c in Model.Classes)
                 {
-                    <option value="@c.Id" >@c.Name</option>
+                    <option value="@c.Id" selected="@(c.Id == Model.Classid)">@c.Name</option>
                 }
             </select>
 
-            <select name="courseidedit">
-                @foreach (Course c in listCourse)
+            <select name="Courseid">
+                @foreach (Course c in Model.Courses)
                 {
-                    <option value="@c.Id" >@c.Code</option>
+                    <option value="@c.Id" selected="@(c.Id == Model.Courseid)">@c.Code</option>
                 }
             </select>
 
-            <select name="roomidedit">
-                @foreach (Room r in listRoom)
+            <select name="Roomid">
+                @foreach (Room r in Model.Rooms)
                 {
-                    <option value="@r.Id" >@r.Name</option>
+                    <option value="@r.Id" selected="@(r.Id == Model.Roomid)">@r.Name</option>
                 }
             </select>
 
-            <select name="teacheridedit">
-                @foreach (User u in listTeacher)
+            <select name="Teacherid">
+                @foreach (User u in Model.Teachers)
                 {
-                    <option value="@u.Id" >@u.Username</option>
+                    <option value="@u.Id" selected="@(u.Id == Model.Teacherid)">@u.Username</option>
                 }
             </select>
 
-            <select name="timeslottypeidedit">
-                @foreach (TimeslotType tst in listTimeslotType)
+            <select name="Timeslottypeid">
+                @foreach (TimeslotType tst in Model.Timeslottypes)
                 {
-                    <option value="@tst.Id" >@tst.Name</option>
+                    <option value="@tst.Id" selected="@(tst.Id == Model.Timeslottypeid)">@tst.Name</option>
                 }
             </select>
-
-
-            <input type="submit" value="Edit">
+            @if (Model.expectedTt != null)
+            {
+                @if (!Model.expectedTt.Note.Equals("Edit success"))
+                {
+                    <input type="submit" value="Edit">
+                }
+                else
+                {
+                    <input type="submit" value="Edit" disabled>
+                }
+                <p style="color: red">@Model.expectedTt.Note</p>
+            }
+            else
+            {
+                <input type="submit" value="Edit">
+            }
         </form>
     </div>
-    @if (expectedTT != null)
-    {
-        <p style="color: red">@expectedTT.Note</p>
-    }
+
 </div>
 
 <div>
     <a href="/timetable">Back to List</a>
 </div>
-
-<script>
-    // Hàm này sẽ được gọi khi form được submit
-    function saveSelectedValues() {
-        var selectedValues = {};
-
-        // Lưu giá trị đã chọn của mỗi select box vào object selectedValues
-        selectedValues['classidedit'] = document.querySelector('select[name="classidedit"]').value;
-        selectedValues['courseidedit'] = document.querySelector('select[name="courseidedit"]').value;
-        selectedValues['roomidedit'] = document.querySelector('select[name="roomidedit"]').value;
-        selectedValues['teacheridedit'] = document.querySelector('select[name="teacheridedit"]').value;
-        selectedValues['timeslottypeidedit'] = document.querySelector('select[name="timeslottypeidedit"]').value;
-
-        // Lưu object selectedValues vào localStorage
-        localStorage.setItem('selectedValuesedit', JSON.stringify(selectedValues));
-    }
-
-    // Hàm này sẽ được gọi khi trang được load
-    window.onload = function () {
-        // Lấy các giá trị đã lưu từ localStorage
-        var savedValues = JSON.parse(localStorage.getItem('selectedValuesedit'));
-
-        // Nếu đã có giá trị được lưu trước đó
-        if (savedValues) {
-            // Khôi phục các giá trị đã chọn cho các select box
-            document.querySelector('select[name="classidedit"]').value = savedValues['classidedit'];
-            document.querySelector('select[name="courseidedit"]').value = savedValues['courseidedit'];
-            document.querySelector('select[name="roomidedit"]').value = savedValues['roomidedit'];
-            document.querySelector('select[name="teacheridedit"]').value = savedValues['teacheridedit'];
-            document.querySelector('select[name="timeslottypeidedit"]').value = savedValues['timeslottypeidedit'];
-        }
-    }
-</script>
