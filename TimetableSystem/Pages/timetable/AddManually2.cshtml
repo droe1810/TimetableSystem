@@ -1,0 +1,149 @@
+﻿@page
+@using TimetableSystem.Models
+@using Newtonsoft.Json
+@model TimetableSystem.Pages.timetable.AddManually2Model
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
+    List<Room> listRoom = ViewData["listRoom"] as List<Room>;
+    List<User> listTeacher = ViewData["listTeacher"] as List<User>;
+    List<Course> listCourse = ViewData["listCourse"] as List<Course>;
+    List<TimeslotType> listTimeslotType = ViewData["listTimeslotType"] as List<TimeslotType>;
+    List<Class> listClass = ViewData["listClass"] as List<Class>;
+
+    string Msg = ViewData["Msg"] as string;
+}
+
+<h1>Add timetable</h1>
+
+<h4></h4>
+<hr />
+
+<div class="row">
+    <div>
+        <form method="post" onsubmit="saveSelectedValues()" asp-page-handler="AddToWishList">
+            <input type="hidden" name="listTimetableDisplay" value="@JsonConvert.SerializeObject(listTimetable)" />
+            <select name="classidadd2">
+                @foreach (Class c in listClass)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </select>
+
+            <select name="courseidadd2">
+                @foreach (Course c in listCourse)
+                {
+                    <option value="@c.Id">@c.Code</option>
+                }
+            </select>
+
+            <select name="roomidadd2">
+                @foreach (Room r in listRoom)
+                {
+                    <option value="@r.Id">@r.Name</option>
+                }
+            </select>
+
+            <select name="teacheridadd2">
+                @foreach (User u in listTeacher)
+                {
+                    <option value="@u.Id">@u.Username</option>
+                }
+            </select>
+
+            <select name="timeslottypeidadd2">
+                @foreach (TimeslotType tst in listTimeslotType)
+                {
+                    <option value="@tst.Id">@tst.Name</option>
+                }
+            </select>
+
+            <input type="submit" value="Add to wish list">
+        </form>
+    </div>
+</div>
+
+@if (Msg != null)
+{
+    <p style="color: red">@Msg</p>
+}
+
+
+@if (listTimetable != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Class</th>
+                <th>Course</th>
+                <th>Room</th>
+                <th>Teacher</th>
+                <th>Timeslot Type</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int stt = 1;
+            }
+            @foreach (var timetable in listTimetable)
+            {
+                <tr>
+                    <td>@stt</td>
+                    <td>@timetable.Class.Name</td>
+                    <td>@timetable.Course.Code</td>
+                    <td>@timetable.Room.Name</td>
+                    <td>@timetable.Teacher.Username</td>
+                    <td>@timetable.TimeslotType.Name</td>
+                    <td style="color : red">@timetable.Note</td>
+                </tr>
+                stt++;
+            }
+        </tbody>
+
+    </table>
+
+    <form method="post" asp-page-handler="Save">
+        <input type="hidden" name="listTimetableDisplay" value="@JsonConvert.SerializeObject(listTimetable)" />
+        <input type="submit" value="Ignore invalid data and save">
+    </form>
+
+}
+
+<div>
+    <a href="/timetable">Back to List</a>
+</div>
+
+<script>
+    // Hàm này sẽ được gọi khi form được submit
+    function saveSelectedValues() {
+        var selectedValues = {};
+
+        // Lưu giá trị đã chọn của mỗi select box vào object selectedValues
+        selectedValues['classidadd2'] = document.querySelector('select[name="classidadd2"]').value;
+        selectedValues['courseidadd2'] = document.querySelector('select[name="courseidadd2"]').value;
+        selectedValues['roomidadd2'] = document.querySelector('select[name="roomidadd2"]').value;
+        selectedValues['teacheridadd2'] = document.querySelector('select[name="teacheridadd2"]').value;
+        selectedValues['timeslottypeidadd2'] = document.querySelector('select[name="timeslottypeidadd2"]').value;
+
+        // Lưu object selectedValues vào localStorage
+        localStorage.setItem('selectedValuesadd2', JSON.stringify(selectedValues));
+    }
+
+    // Hàm này sẽ được gọi khi trang được load
+    window.onload = function () {
+        // Lấy các giá trị đã lưu từ localStorage
+        var savedValues = JSON.parse(localStorage.getItem('selectedValuesadd2'));
+
+        // Nếu đã có giá trị được lưu trước đó
+        if (savedValues) {
+            // Khôi phục các giá trị đã chọn cho các select box
+            document.querySelector('select[name="classidadd2"]').value = savedValues['classidadd2'];
+            document.querySelector('select[name="courseidadd2"]').value = savedValues['courseidadd2'];
+            document.querySelector('select[name="roomidadd2"]').value = savedValues['roomidadd2'];
+            document.querySelector('select[name="teacheridadd2"]').value = savedValues['teacheridadd2'];
+            document.querySelector('select[name="timeslottypeidadd2"]').value = savedValues['timeslottypeidadd2'];
+        }
+    }
+</script>
