@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using TimetableSystem.Hubs;
 using TimetableSystem.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 
 // Add DbContext
 builder.Services.AddDbContext<prn221Context>(options =>
@@ -39,5 +41,6 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHub<DocumentHub>("/documentHub");
 
 app.Run();

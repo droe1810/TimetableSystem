@@ -7,11 +7,19 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using TimetableSystem.Services;
+using Microsoft.AspNetCore.SignalR;
+using TimetableSystem.Hubs;
 
 namespace TimetableSystem.Pages.timetable
 {
     public class IndexModel : PageModel
     {
+        private readonly IHubContext<DocumentHub> _hubContext;
+
+        public IndexModel( IHubContext<DocumentHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
 
         public IActionResult OnGet()
         {
@@ -90,12 +98,14 @@ namespace TimetableSystem.Pages.timetable
             return Redirect($"/timetable/Edit?timetableid={timetableid}");
         }
 
-        public IActionResult OnGetDelete(int timetableid)
+        public async Task<IActionResult> OnGetDelete(int timetableid)
         {
             TimetableService.DeleteTimetable(timetableid);
             getData();
             List<Timetable> listTimetable = TimetableService.GetAllTimetable();
             ViewData["listTimetable"] = listTimetable;
+            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
+
             return Page();
         }
     }
