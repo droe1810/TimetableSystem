@@ -6,6 +6,8 @@ using TimetableSystem.Models;
 using System.Text.Json;
 using TimetableSystem.Services;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.SignalR;
+using TimetableSystem.Hubs;
 
 
 
@@ -14,7 +16,12 @@ namespace TimetableSystem.Pages.timetable
 {
     public class ImportModel : PageModel
     {
+        private readonly IHubContext<DocumentHub> _hubContext;
 
+        public ImportModel(IHubContext<DocumentHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
 
 
         public void OnGet()
@@ -31,51 +38,59 @@ namespace TimetableSystem.Pages.timetable
             {
                 using (var r = new StreamReader(file.OpenReadStream()))
                 {
-                    string json = r.ReadToEnd();
-                    List<TimetableJson> listTimetableJson = System.Text.Json.JsonSerializer.Deserialize<List<TimetableJson>>(json);
-                    foreach (var itemJson in listTimetableJson)
-                    {
-                        Timetable item = new Timetable();
-                        item.Course = CourseService.GetCourseByCode(itemJson.CourseCode);
-                        item.Room = RoomService.GetRoomByName(itemJson.RoomName);
-                        item.Class = ClassService.GetClassByName(itemJson.ClassName);
-                        item.Teacher = UserService.GetUserByName(itemJson.TeacherName);
-                        item.TimeslotType = TimeslotTypeService.GetTimeslotTypeByName(itemJson.TimeslotTypeName);
-
-
-                        foreach (var itemCheck in listTimetableToCheck)
+                    try {
+                        string json = r.ReadToEnd();
+                        List<TimetableJson> listTimetableJson = System.Text.Json.JsonSerializer.Deserialize<List<TimetableJson>>(json);
+                        foreach (var itemJson in listTimetableJson)
                         {
-                            if (item.Teacher.Id == itemCheck.Teacher.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                            Timetable item = new Timetable();
+                            item.Course = CourseService.GetCourseByCode(itemJson.CourseCode);
+                            item.Room = RoomService.GetRoomByName(itemJson.RoomName);
+                            item.Class = ClassService.GetClassByName(itemJson.ClassName);
+                            item.Teacher = UserService.GetUserByName(itemJson.TeacherName);
+                            item.TimeslotType = TimeslotTypeService.GetTimeslotTypeByName(itemJson.TimeslotTypeName);
+
+
+                            foreach (var itemCheck in listTimetableToCheck)
                             {
-                                item.Note += $" {item.Teacher.Username} has been teaching in timeslot {item.TimeslotType.Name} -";
+                                if (item.Teacher.Id == itemCheck.Teacher.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                                {
+                                    item.Note += $" {item.Teacher.Username} has been teaching in timeslot {item.TimeslotType.Name} -";
+                                }
+                                if (item.Class.Id == itemCheck.Class.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                                {
+                                    item.Note += $" {item.Class.Name} has been studing in timeslot {item.TimeslotType.Name} -";
+                                }
+                                if (item.Room.Id == itemCheck.Room.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                                {
+                                    item.Note += $" {item.Room.Name} has been booking in timeslot {item.TimeslotType.Name} -";
+                                }
+                                if (item.Class.Id == itemCheck.Class.Id && item.Course.Id == itemCheck.Course.Id)
+                                {
+                                    item.Note += $" {item.Class.Name} has taken the course {item.Course.Code} before -";
+                                }
+
                             }
-                            if (item.Class.Id == itemCheck.Class.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                            if (item.Note == null || item.Note.Equals(""))
                             {
-                                item.Note += $" {item.Class.Name} has been studing in timeslot {item.TimeslotType.Name} -";
+                                listTimetableToCheck.Add(item);
                             }
-                            if (item.Room.Id == itemCheck.Room.Id && item.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                            else
                             {
-                                item.Note += $" {item.Room.Name} has been booking in timeslot {item.TimeslotType.Name} -";
+                                int noteLegnth = item.Note.Length;
+                                item.Note = item.Note.Remove(noteLegnth - 1, 1);
                             }
-                            if (item.Class.Id == itemCheck.Class.Id && item.Course.Id == itemCheck.Course.Id)
-                            {
-                                item.Note += $" {item.Class.Name} has taken the course {item.Course.Code} before -";
-                            }
+                            listTimetableToDisplay.Add(item);
+                            ViewData["listTimetable"] = listTimetableToDisplay;
 
                         }
-                        if (item.Note == null || item.Note.Equals(""))
-                        {
-                            listTimetableToCheck.Add(item);
-                        }
-                        else
-                        {
-                            int noteLegnth = item.Note.Length;
-                            item.Note = item.Note.Remove(noteLegnth - 1, 1);
-                        }
-                        listTimetableToDisplay.Add(item);
-                        ViewData["listTimetable"] = listTimetableToDisplay;
-
                     }
+                    catch
+                    {
+                        ViewData["Msg"] = "The file's data is invalid";
+                        return Page();
+                    }
+                    
                 }
 
             }
@@ -84,7 +99,7 @@ namespace TimetableSystem.Pages.timetable
 
         }
 
-        public IActionResult OnPostSave(string listTimetableDisplay)
+        public async Task<IActionResult> OnPostSave(string listTimetableDisplay)
         {
             if (!string.IsNullOrEmpty(listTimetableDisplay))
             {
@@ -112,6 +127,7 @@ namespace TimetableSystem.Pages.timetable
 
                 }
             }
+            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
             return Page();
         }
     }

@@ -5,6 +5,7 @@
 @addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     List<Timetable> listTimetable = ViewData["listTimetable"] as List<Timetable>;
+    string Msg = ViewData["Msg"] as string;
 }
 
 
@@ -14,8 +15,12 @@
     <input type="file" name="file">
     <input type="submit" value="Import">
 </form>
+@if (Msg != null)
+{
+    <p style="color: red">@Msg</p>
+}
 
-@if (ViewData["listTimetable"] != null)
+@if (listTimetable != null)
 {
     <table class="table">
         <thead>

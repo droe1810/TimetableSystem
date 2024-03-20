@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
+using TimetableSystem.Hubs;
 using TimetableSystem.Models;
 using TimetableSystem.Services;
 
@@ -7,7 +9,12 @@ namespace TimetableSystem.Pages.timetable
 {
     public class EditModel : PageModel
     {
+        private readonly IHubContext<DocumentHub> _hubContext;
 
+        public EditModel(IHubContext<DocumentHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
         public void getData()
         {
             List<Room> listRoom = RoomService.GetAllRoom();
@@ -35,7 +42,7 @@ namespace TimetableSystem.Pages.timetable
             return Page();
         }
 
-        public IActionResult OnPostEdit(int timetableid, int classidedit, int courseidedit, int roomidedit, int teacheridedit, int timeslottypeidedit)
+        public async Task<IActionResult> OnPostEdit(int timetableid, int classidedit, int courseidedit, int roomidedit, int teacheridedit, int timeslottypeidedit)
         {
             Timetable oldTt = TimetableService.GetTimetableById(timetableid);
 
@@ -96,6 +103,7 @@ namespace TimetableSystem.Pages.timetable
           
             ViewData["expectedTT"] = expectedTT;
             ViewData["timetable"] = oldTt;
+            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
 
             getData();
             return Page();
