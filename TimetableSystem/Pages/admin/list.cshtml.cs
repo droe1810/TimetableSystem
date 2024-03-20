@@ -10,7 +10,7 @@ using TimetableSystem.Services;
 using Microsoft.AspNetCore.SignalR;
 using TimetableSystem.Hubs;
 
-namespace TimetableSystem.Pages.timetable
+namespace TimetableSystem.Pages.admin
 {
     public class IndexModel : PageModel
     {
