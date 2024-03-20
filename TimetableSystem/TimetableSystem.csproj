@@ -22,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Pages\teacher\" />
 	  <Folder Include="wwwroot\exports\" />
 	</ItemGroup>
 

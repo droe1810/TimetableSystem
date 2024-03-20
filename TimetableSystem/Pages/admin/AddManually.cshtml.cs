@@ -6,7 +6,7 @@ using TimetableSystem.Hubs;
 using TimetableSystem.Models;
 using TimetableSystem.Services;
 
-namespace TimetableSystem.Pages.timetable
+namespace TimetableSystem.Pages.admin
 {
     public class AddManuallyModel : PageModel
     {

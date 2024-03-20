@@ -17,5 +17,23 @@ namespace TimetableSystem.Models
 
         public virtual Role? Role { get; set; }
         public virtual ICollection<Timetable> Timetables { get; set; }
+
+        public bool isAdmin(int? roleId)
+        {
+            if (roleId == null || roleId != 1)
+            {
+                return false;
+            }
+            else { return true; }
+        }
+
+        public bool isTeacher(int? roleId)
+        {
+            if (roleId == null || roleId != 2)
+            {
+                return false;
+            }
+            else { return true; }
+        }
     }
 }

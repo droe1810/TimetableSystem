@@ -12,7 +12,7 @@ using TimetableSystem.Hubs;
 
 
 
-namespace TimetableSystem.Pages.timetable
+namespace TimetableSystem.Pages.admin
 {
     public class ImportModel : PageModel
     {

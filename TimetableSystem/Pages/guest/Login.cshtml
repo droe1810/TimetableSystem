@@ -1,0 +1,28 @@
+﻿@page
+@model TimetableSystem.Pages.guest.LoginModel;
+@{
+}
+
+<div class="mx-auto w-50 mt-5">
+    <form method="post">
+        <div class="text-danger">
+            @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+        <div class="form-group">
+            <label class="control-label">Username</label>
+            <input required asp-for="user.Username" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Password</label>
+            <input required asp-for="user.Password" type="password" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Login" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
