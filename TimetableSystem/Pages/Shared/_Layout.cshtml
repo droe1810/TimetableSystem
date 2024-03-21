@@ -45,21 +45,29 @@
                             </li>
                         }
 
-                        @if (user == null)
+                        @if (user != null && user.isTeacher(user.RoleId))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" style="float: right" asp-area="" asp-page="/guest/login">Login</a>
+                                <a class="nav-link text-dark" asp-area="" asp-page="/teacher/view">Weekly Timetable</a>
+                            </li>
+                        }
+
+                        @if (user == null)
+                        {
+                            <li class="nav-item" style="float: right">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/guest/login">Login</a>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" style="float: right" asp-area="" asp-page="/common/logout">Logout</a>
+                            <li class="nav-item" style="float: right">
+                                <p class="nav-link text-dark">Hello @user.Username</p>
+                            </li>
+                            <li class="nav-item" style="float: right">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/common/logout">Logout</a>
                             </li>
                         }
                     </ul>
-
-                   
                 </div>
             </div>
         </nav>

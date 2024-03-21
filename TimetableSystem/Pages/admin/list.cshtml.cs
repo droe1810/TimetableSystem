@@ -131,7 +131,7 @@ namespace TimetableSystem.Pages.admin
 
         public IActionResult OnGetEdit(int timetableid)
         {
-            return Redirect($"/timetable/Edit?timetableid={timetableid}");
+            return Redirect($"/admin/Edit?timetableid={timetableid}");
         }
         public async Task<IActionResult> OnGetDelete(int timetableid)
         {

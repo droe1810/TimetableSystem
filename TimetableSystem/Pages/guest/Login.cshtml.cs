@@ -29,7 +29,15 @@ namespace TimetableSystem.Pages.guest
                 string userJson = JsonSerializer.Serialize(authenticatedUser);
                 HttpContext.Session.SetString("currentUser", userJson);
 
-                return RedirectToPage("/admin/list");
+                if(authenticatedUser.RoleId == 1)
+                {
+                    return RedirectToPage("/Index");
+                }
+                else
+                {
+                    return RedirectToPage("/Index");
+                }
+
             }
             else
             {

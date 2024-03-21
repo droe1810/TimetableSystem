@@ -19,6 +19,20 @@ namespace TimetableSystem.Services
             }
         }
 
+        public static List<Timetable> GetTimetablesByTeacherId(int teacherId)
+        {
+            using (var context = new prn221Context())
+            {
+                return context.Timetables.Where(t => t.TeacherId == teacherId)
+                    .Include(x => x.Class)
+                    .Include(x => x.Course)
+                    .Include(x => x.Room)
+                    .Include(x => x.Teacher)
+                    .Include(x => x.TimeslotType)
+                    .ToList();
+            }
+        }
+
         public static Timetable GetTimetableById(int id)
         {
             using (var context = new prn221Context())
