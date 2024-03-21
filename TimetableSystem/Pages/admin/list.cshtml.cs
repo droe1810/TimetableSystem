@@ -16,6 +16,7 @@ namespace TimetableSystem.Pages.admin
     {
         private readonly IHubContext<DocumentHub> _hubContext;
         private readonly prn221Context _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public List<Timetable> Timetables { get; set; } = null!;
         public List<Class> Classes { get; set; } = null!;
@@ -45,21 +46,55 @@ namespace TimetableSystem.Pages.admin
         private int _totalItem, _pageSize, _startIndex;
         public int TotalPage { get; set; }
 
-        public IndexModel(IHubContext<DocumentHub> hubContext, prn221Context dbContext)
+        public IndexModel(IHubContext<DocumentHub> hubContext, prn221Context dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
             _hubContext = hubContext;
+            _httpContextAccessor = httpContextAccessor;
         }
         public IActionResult OnGet()
         {
-            GetDataPagging();
-            return Page();
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
+            {
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
+                {
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    GetDataPagging();
+                    return Page();
+                }
+            }
         }
 
         public IActionResult OnPostFilter()
         {
-            GetDataPagging();
-            return Page();
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
+            {
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
+                {
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    GetDataPagging();
+                    return Page();
+                }
+            }
+                  
         }
         private void GetDataPagging()
         {
@@ -96,50 +131,98 @@ namespace TimetableSystem.Pages.admin
 
         public IActionResult OnPostExportToJson()
         {
-            List<Timetable> listTimetable = TimetableService.GetAllTimetable();
-            List<TimetableJson> listTimetableJson = new List<TimetableJson>();
-            foreach (var item in listTimetable)
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
             {
-                TimetableJson itemJson = new TimetableJson();
-                itemJson.ClassName = item.Class.Name;
-                itemJson.RoomName = item.Room.Name;
-                itemJson.CourseCode = item.Course.Code;
-                itemJson.TimeslotTypeName = item.TimeslotType.Name;
-                itemJson.TeacherName = item.Teacher.Username;
-                listTimetableJson.Add(itemJson);
+                return Redirect("/AccessDenied");
             }
-
-            string json = JsonConvert.SerializeObject(listTimetableJson);
-
-            string fileName = "timetable.json";
-
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports", fileName);
-
-            if (!System.IO.File.Exists(filePath))
+            else
             {
-                using (StreamWriter sw = System.IO.File.CreateText(filePath))
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
                 {
-                    sw.Close();
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    List<Timetable> listTimetable = TimetableService.GetAllTimetable();
+                    List<TimetableJson> listTimetableJson = new List<TimetableJson>();
+                    foreach (var item in listTimetable)
+                    {
+                        TimetableJson itemJson = new TimetableJson();
+                        itemJson.ClassName = item.Class.Name;
+                        itemJson.RoomName = item.Room.Name;
+                        itemJson.CourseCode = item.Course.Code;
+                        itemJson.TimeslotTypeName = item.TimeslotType.Name;
+                        itemJson.TeacherName = item.Teacher.Username;
+                        listTimetableJson.Add(itemJson);
+                    }
+
+                    string json = JsonConvert.SerializeObject(listTimetableJson);
+
+                    string fileName = "timetable.json";
+
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports", fileName);
+
+                    if (!System.IO.File.Exists(filePath))
+                    {
+                        using (StreamWriter sw = System.IO.File.CreateText(filePath))
+                        {
+                            sw.Close();
+                        }
+                    }
+
+                    System.IO.File.WriteAllText(filePath, json);
+
+                    byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+                    return File(fileBytes, "application/json", fileName);
                 }
             }
-
-            System.IO.File.WriteAllText(filePath, json);
-
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(fileBytes, "application/json", fileName);
         }
 
         public IActionResult OnGetEdit(int timetableid)
         {
-            return Redirect($"/admin/Edit?timetableid={timetableid}");
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
+            {
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
+                {
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    return Redirect($"/admin/Edit?timetableid={timetableid}");
+                }
+            }
         }
         public async Task<IActionResult> OnGetDelete(int timetableid)
         {
-            TimetableService.DeleteTimetable(timetableid);
-            GetDataPagging();
-            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
+            {
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
+                {
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    TimetableService.DeleteTimetable(timetableid);
+                    GetDataPagging();
+                    await _hubContext.Clients.All.SendAsync("ReloadDocuments");
 
-            return Page();
+                    return Page();
+                }
+            }     
         }
     }
 }

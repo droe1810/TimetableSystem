@@ -5,12 +5,16 @@ using Newtonsoft.Json;
 using TimetableSystem.Hubs;
 using TimetableSystem.Models;
 using TimetableSystem.Services;
+using System.Text.Json;
+
 
 namespace TimetableSystem.Pages.admin
 {
     public class AddManuallyModel : PageModel
     {
         private readonly IHubContext<DocumentHub> _hubContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public List<Class> Classes { get; set; } = null!;
         public List<Course> Courses { get; set; } = null!;
         public List<Room> Rooms { get; set; } = null!;
@@ -35,9 +39,10 @@ namespace TimetableSystem.Pages.admin
 
         [BindProperty]
         public Timetable expectedTt { get; set; }
-        public AddManuallyModel(IHubContext<DocumentHub> hubContext)
+        public AddManuallyModel(IHubContext<DocumentHub> hubContext, IHttpContextAccessor httpContextAccessor)
         {
             _hubContext = hubContext;
+            _httpContextAccessor = httpContextAccessor;
         }
         public void getData()
         {
@@ -50,105 +55,154 @@ namespace TimetableSystem.Pages.admin
 
         public IActionResult OnGet()
         {
-            getData();
-            return Page();
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if(userJson == null)
+            {
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
+                {
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    getData();
+                    return Page();
+                }
+            }
         }
 
         public async Task<IActionResult> OnPostAddToWishList(string listTimetableDisplayJson)
         {
-            expectedTt.Class = ClassService.GetClassById(Classid);
-            expectedTt.Course = CourseService.GetCourseById(Courseid);
-            expectedTt.Room = RoomService.GetRoomById(Roomid);
-            expectedTt.Teacher = UserService.GetUserById(Teacherid);
-            expectedTt.TimeslotType = TimeslotTypeService.GetTimeslotTypeById(Timeslottypeid);
-
-            List<Timetable> listCheck = TimetableService.GetAllTimetable();
-            List<Timetable> listTimetableDisplay = JsonConvert.DeserializeObject<List<Timetable>>(listTimetableDisplayJson);
-            
-            if (listTimetableDisplay != null)
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
             {
-                foreach (var item in listTimetableDisplay)
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
                 {
-                    if(item.Note == null || item.Note.Length == 0)
+                    return Redirect("/AccessDenied");
+                }
+                else
+                {
+                    expectedTt.Class = ClassService.GetClassById(Classid);
+                    expectedTt.Course = CourseService.GetCourseById(Courseid);
+                    expectedTt.Room = RoomService.GetRoomById(Roomid);
+                    expectedTt.Teacher = UserService.GetUserById(Teacherid);
+                    expectedTt.TimeslotType = TimeslotTypeService.GetTimeslotTypeById(Timeslottypeid);
+
+                    List<Timetable> listCheck = TimetableService.GetAllTimetable();
+                    List<Timetable> listTimetableDisplay = JsonConvert.DeserializeObject<List<Timetable>>(listTimetableDisplayJson);
+
+                    if (listTimetableDisplay != null)
                     {
-                        listCheck.Add(item);
+                        foreach (var item in listTimetableDisplay)
+                        {
+                            if (item.Note == null || item.Note.Length == 0)
+                            {
+                                listCheck.Add(item);
+                            }
+                        }
                     }
-                }
-            }
-            else
-            {
-                listTimetableDisplay = new List<Timetable>();
-            }
+                    else
+                    {
+                        listTimetableDisplay = new List<Timetable>();
+                    }
 
-            foreach (var itemCheck in listCheck)
-            {
-                if (expectedTt.Teacher.Id == itemCheck.Teacher.Id && expectedTt.TimeslotType.Id == itemCheck.TimeslotType.Id)
-                {
-                    expectedTt.Note += $" {expectedTt.Teacher.Username} has been teaching in timeslot {expectedTt.TimeslotType.Name} -";
-                }
-                if (expectedTt.Class.Id == itemCheck.Class.Id && expectedTt.TimeslotType.Id == itemCheck.TimeslotType.Id)
-                {
-                    expectedTt.Note += $" {expectedTt.Class.Name} has been studing in timeslot {expectedTt.TimeslotType.Name} -";
-                }
-                if (expectedTt.Room.Id == itemCheck.Room.Id && expectedTt.TimeslotType.Id == itemCheck.TimeslotType.Id)
-                {
-                    expectedTt.Note += $" {expectedTt.Room.Name} has been booking in timeslot {expectedTt.TimeslotType.Name} -";
-                }
-                if (expectedTt.Class.Id == itemCheck.Class.Id && expectedTt.Course.Id == itemCheck.Course.Id)
-                {
-                    expectedTt.Note += $" {expectedTt.Class.Name} has taken the course {expectedTt.Course.Code} before -";
-                }
-            }
+                    foreach (var itemCheck in listCheck)
+                    {
+                        if (expectedTt.Teacher.Id == itemCheck.Teacher.Id && expectedTt.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                        {
+                            expectedTt.Note += $" {expectedTt.Teacher.Username} has been teaching in timeslot {expectedTt.TimeslotType.Name} -";
+                        }
+                        if (expectedTt.Class.Id == itemCheck.Class.Id && expectedTt.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                        {
+                            expectedTt.Note += $" {expectedTt.Class.Name} has been studing in timeslot {expectedTt.TimeslotType.Name} -";
+                        }
+                        if (expectedTt.Room.Id == itemCheck.Room.Id && expectedTt.TimeslotType.Id == itemCheck.TimeslotType.Id)
+                        {
+                            expectedTt.Note += $" {expectedTt.Room.Name} has been booking in timeslot {expectedTt.TimeslotType.Name} -";
+                        }
+                        if (expectedTt.Class.Id == itemCheck.Class.Id && expectedTt.Course.Id == itemCheck.Course.Id)
+                        {
+                            expectedTt.Note += $" {expectedTt.Class.Name} has taken the course {expectedTt.Course.Code} before -";
+                        }
+                    }
 
-            if (expectedTt.Note == null || expectedTt.Note.Equals(""))
-            {
-                listCheck.Add(expectedTt);
-            }
-            else
-            {
-                int noteLegnth = expectedTt.Note.Length;
-                expectedTt.Note = expectedTt.Note.Remove(noteLegnth - 1, 1);
-            }
+                    if (expectedTt.Note == null || expectedTt.Note.Equals(""))
+                    {
+                        listCheck.Add(expectedTt);
+                    }
+                    else
+                    {
+                        int noteLegnth = expectedTt.Note.Length;
+                        expectedTt.Note = expectedTt.Note.Remove(noteLegnth - 1, 1);
+                    }
 
-            listTimetableDisplay.Add(expectedTt);
-            ViewData["listTimetableDisplay"] = listTimetableDisplay;
+                    listTimetableDisplay.Add(expectedTt);
+                    ViewData["listTimetableDisplay"] = listTimetableDisplay;
 
-            getData();
-            return Page();
+                    getData();
+                    return Page();
+                }
+            }         
         }
 
         public async Task<IActionResult> OnPostSave(string listTimetableDisplayJson)
         {
-            if (!string.IsNullOrEmpty(listTimetableDisplayJson))
+
+            string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
+            if (userJson == null)
             {
-                List<Timetable> listDisplay = JsonConvert.DeserializeObject<List<Timetable>>(listTimetableDisplayJson);
-                List<Timetable> listToSave = new List<Timetable>();
-
-                foreach (var itemDisplay in listDisplay)
+                return Redirect("/AccessDenied");
+            }
+            else
+            {
+                User u = System.Text.Json.JsonSerializer.Deserialize<User>(userJson);
+                if (!Authentication.IsAdmin(u))
                 {
-                    if (itemDisplay.Note == null || itemDisplay.Note.Equals(""))
-                    {
-                        listToSave.Add(itemDisplay);
-                    }
+                    return Redirect("/AccessDenied");
                 }
-
-                foreach (var itemToSave in listToSave)
+                else
                 {
-                    Timetable item = new Timetable();
-                    item.CourseId = itemToSave.Course.Id;
-                    item.RoomId = itemToSave.Room.Id;
-                    item.ClassId = itemToSave.Class.Id;
-                    item.TeacherId = itemToSave.Teacher.Id;
-                    item.TimeslotTypeId = itemToSave.TimeslotType.Id;
+                    if (!string.IsNullOrEmpty(listTimetableDisplayJson))
+                    {
+                        List<Timetable> listDisplay = JsonConvert.DeserializeObject<List<Timetable>>(listTimetableDisplayJson);
+                        List<Timetable> listToSave = new List<Timetable>();
 
-                    TimetableService.AddTimetable(item);
+                        foreach (var itemDisplay in listDisplay)
+                        {
+                            if (itemDisplay.Note == null || itemDisplay.Note.Equals(""))
+                            {
+                                listToSave.Add(itemDisplay);
+                            }
+                        }
 
+                        foreach (var itemToSave in listToSave)
+                        {
+                            Timetable item = new Timetable();
+                            item.CourseId = itemToSave.Course.Id;
+                            item.RoomId = itemToSave.Room.Id;
+                            item.ClassId = itemToSave.Class.Id;
+                            item.TeacherId = itemToSave.Teacher.Id;
+                            item.TimeslotTypeId = itemToSave.TimeslotType.Id;
+
+                            TimetableService.AddTimetable(item);
+                        }
+                    }
+                    ViewData["Msg"] = "Add successfully";
+                    getData();
+                    await _hubContext.Clients.All.SendAsync("ReloadDocuments");
+                    return Page();
                 }
             }
-            ViewData["Msg"] = "Add successfully";
-            getData();
-            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
-            return Page();
+                  
         }
     }
 }
