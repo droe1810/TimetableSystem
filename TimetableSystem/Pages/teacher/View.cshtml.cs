@@ -26,34 +26,42 @@ namespace TimetableSystem.Pages.teacher
         public List<Slot> Slots { get; set; }
         public string[][] TimetableTimeSlot { get; set; }
 
-        public async Task<IActionResult> OnGet()
+        public IActionResult OnGet()
         {
             string userJson = _httpContextAccessor.HttpContext.Session.GetString("currentUser");
             if (userJson != null)
             {
-                User authenticatedUser = JsonSerializer.Deserialize<User>(userJson);
-                Times = TimeService.GetAllTime();
-                Slots = SlotService.GetAllSlot();
-
-                TimetableTimeSlot = new string[Times.Count][];
-                for (int i = 0; i < Times.Count; i++)
+                User u = JsonSerializer.Deserialize<User>(userJson);
+                if(Authentication.IsTeacher(u))
                 {
-                    TimetableTimeSlot[i] = new string[Slots.Count];
-                }
+                    Times = TimeService.GetAllTime();
+                    Slots = SlotService.GetAllSlot();
 
-                for (int i = 0; i < Times.Count; i++)
-                {
-                    for (int j = 0; j < Slots.Count; j++)
+                    TimetableTimeSlot = new string[Times.Count][];
+                    for (int i = 0; i < Times.Count; i++)
                     {
-                        Timetable t = GetTimetableOfTeacherByTimeIdAndSlotId(authenticatedUser.Id, Times[i].Id, Slots[j].Id);
-                        TimetableTimeSlot[i][j] = GetActivity(t);
+                        TimetableTimeSlot[i] = new string[Slots.Count];
                     }
+
+                    for (int i = 0; i < Times.Count; i++)
+                    {
+                        for (int j = 0; j < Slots.Count; j++)
+                        {
+                            Timetable t = GetTimetableOfTeacherByTimeIdAndSlotId(u.Id, Times[i].Id, Slots[j].Id);
+                            TimetableTimeSlot[i][j] = GetActivity(t);
+                        }
+                    }
+                }
+                else
+                {
+                    return Redirect("/AccessDenied");
                 }
 
             }
-
-            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
-
+            else
+            {
+                return Redirect("/AccessDenied");
+            }
             return Page();
         }
 
