@@ -120,7 +120,7 @@ else
 <script>
     function confirmDelete(timetableId) {
         if (confirm('Are you sure you want to delete this item?')) {
-            window.location.href = '/timetable?timetableid=' + timetableId + '&handler=Delete';
+            window.location.href = '/admin/list?timetableid=' + timetableId + '&handler=Delete';
         }
     }
 </script>

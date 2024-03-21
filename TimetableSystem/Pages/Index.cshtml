@@ -1,18 +1,29 @@
 ﻿@page
+@inject IHttpContextAccessor HttpContextAccessor;
 @model IndexModel
+@using TimetableSystem.Models
+@using Newtonsoft.Json
+@{
+    var json = HttpContextAccessor.HttpContext.Session.GetString("currentUser");
+    var user = json != null ? JsonConvert.DeserializeObject<User>(json) : null;
+}
 @{
     ViewData["Title"] = "Home page";
 }
 
 <div class="text-center">
     <h1 class="display-4"></h1>
-    <h1 class='mt-5' style='text-align: center; vertical-align: middle; color: silver; user-select: none;'>
-        <pre>
-?  ╱|、
-(˚ˎ 。7  
-        |、˜〵          
-じしˍ,)ノ
-            </pre>
-        10 Điểm Project
-    </h1>
+
+    @if (user == null)
+    {
+        <h1 class='mt-5' style='text-align: center; vertical-align: middle; color: silver; user-select: none;'>
+            <pre>
+    ?  ╱|、
+    (˚ˎ 。7  
+            |、˜〵          
+    じしˍ,)ノ
+                </pre>
+            10 Điểm Project
+        </h1>
+    }
 </div>

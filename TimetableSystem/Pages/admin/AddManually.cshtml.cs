@@ -112,7 +112,6 @@ namespace TimetableSystem.Pages.admin
 
             listTimetableDisplay.Add(expectedTt);
             ViewData["listTimetableDisplay"] = listTimetableDisplay;
-            await _hubContext.Clients.All.SendAsync("ReloadDocuments");
 
             getData();
             return Page();
